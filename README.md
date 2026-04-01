@@ -155,5 +155,4 @@ This tool is built for **educational and authorized security testing only**.
 ## 👨‍💻 Author
 
 **Internship:** CodTech IT Solutions  
-**Domain:** Cybersecurity  
-**Internship Duration:** 2025
+**Domain:** Cybersecurity
