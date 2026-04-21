@@ -1,1120 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CyberGuard Pro — Cybersecurity Suite</title>
-<style>
-/* ─── Reset & Base ─────────────────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#08090f;--bg2:#0d1117;--bg3:#111827;--bg4:#1a2332;
-  --card:#0f1923;--border:#1e2d3d;
-  --green:#00e5a0;--green2:#00b87a;--cyan:#00cfff;--purple:#7c3aed;
-  --red:#ff4757;--orange:#ffa502;--yellow:#ffd32a;
-  --text:#e2e8f0;--muted:#8899aa;
-  --font:"Fira Code","Consolas","Courier New",monospace;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-
-/* ─── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--green2)}
-
-/* ─── Layout ────────────────────────────────────────────────── */
-.layout{display:flex;height:100vh}
-.sidebar{
-  width:240px;min-width:240px;background:var(--bg2);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;height:100vh;z-index:100;
-}
-.main{margin-left:240px;flex:1;overflow-y:auto;padding:28px}
-
-/* ─── Sidebar ────────────────────────────────────────────────── */
-.logo{
-  padding:20px 20px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.logo-icon{
-  width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--cyan));
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
-.logo-text h2{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.5px}
-.logo-text span{font-size:11px;color:var(--muted);font-family:var(--font)}
-
-.nav{padding:12px 8px;flex:1}
-.nav-group{margin-bottom:8px}
-.nav-label{
-  font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1.5px;
-  text-transform:uppercase;padding:0 12px;margin-bottom:4px;
-}
-.nav-btn{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  border-radius:8px;cursor:pointer;transition:.15s;
-  font-size:13.5px;color:var(--muted);border:none;background:none;
-  width:100%;text-align:left;margin-bottom:2px;
-}
-.nav-btn:hover{background:var(--border);color:var(--text)}
-.nav-btn.active{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.2)}
-.nav-btn .icon{font-size:16px;width:20px;text-align:center}
-.nav-btn .badge{
-  margin-left:auto;font-size:10px;background:var(--green);color:#000;
-  padding:1px 6px;border-radius:10px;font-weight:700;
-}
-
-.sidebar-footer{
-  padding:14px 16px;border-top:1px solid var(--border);
-  font-size:11px;color:var(--muted);text-align:center;
-}
-.status-dot{
-  display:inline-block;width:7px;height:7px;border-radius:50%;
-  background:var(--green);margin-right:5px;
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* ─── Page / Card ────────────────────────────────────────────── */
-.page{display:none}
-.page.active{display:block}
-
-.page-header{margin-bottom:24px}
-.page-header h1{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px}
-.page-header p{font-size:13px;color:var(--muted)}
-
-.card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:22px;margin-bottom:18px;
-}
-.card-title{
-  font-size:13px;font-weight:600;color:var(--green);
-  text-transform:uppercase;letter-spacing:1px;
-  margin-bottom:16px;display:flex;align-items:center;gap:8px;
-}
-.card-title::before{
-  content:"";width:3px;height:14px;background:var(--green);border-radius:2px;
-}
-
-/* ─── Form elements ──────────────────────────────────────────── */
-.form-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.form-group{flex:1;min-width:200px}
-.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
-.form-group input,.form-group select{
-  width:100%;background:var(--bg3);border:1px solid var(--border);
-  border-radius:8px;padding:9px 13px;color:var(--text);font-size:13px;
-  font-family:var(--font);outline:none;transition:.15s;
-}
-.form-group input:focus,.form-group select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,229,160,.1)}
-.form-group input[type=file]{padding:7px 13px;cursor:pointer}
-.form-group input[type=file]::file-selector-button{
-  background:var(--green2);color:#000;border:none;border-radius:5px;
-  padding:4px 12px;font-size:12px;cursor:pointer;margin-right:10px;
-}
-
-.btn{
-  padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;
-  border:none;cursor:pointer;transition:.15s;display:inline-flex;
-  align-items:center;gap:7px;
-}
-.btn-primary{background:var(--green);color:#000}
-.btn-primary:hover{background:var(--green2)}
-.btn-secondary{background:var(--bg4);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--green);color:var(--green)}
-.btn-danger{background:var(--red);color:#fff}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-
-/* ─── Result area ────────────────────────────────────────────── */
-.result-area{
-  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
-  padding:16px;font-family:var(--font);font-size:12.5px;
-  min-height:80px;max-height:440px;overflow-y:auto;line-height:1.7;
-  display:none;
-}
-.result-area.show{display:block}
-.result-area .ok{color:var(--green)}
-.result-area .warn{color:var(--orange)}
-.result-area .err{color:var(--red)}
-.result-area .info{color:var(--cyan)}
-.result-area .key{color:var(--purple)}
-
-/* ─── Status pills ───────────────────────────────────────────── */
-.pill{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;
-}
-.pill-green{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25)}
-.pill-red{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.25)}
-.pill-orange{background:rgba(255,165,2,.12);color:var(--orange);border:1px solid rgba(255,165,2,.25)}
-.pill-cyan{background:rgba(0,207,255,.12);color:var(--cyan);border:1px solid rgba(0,207,255,.25)}
-
-/* ─── Hash table ─────────────────────────────────────────────── */
-.hash-table{width:100%;border-collapse:collapse;font-family:var(--font);font-size:12px}
-.hash-table th{
-  text-align:left;color:var(--muted);font-weight:600;padding:6px 12px;
-  border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.8px;
-}
-.hash-table td{padding:8px 12px;border-bottom:1px solid rgba(30,45,61,.5);word-break:break-all}
-.hash-table tr:last-child td{border:none}
-.hash-table tr:hover td{background:rgba(0,229,160,.03)}
-
-/* ─── Port list ──────────────────────────────────────────────── */
-.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}
-.port-card{
-  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
-  padding:12px;display:flex;flex-direction:column;gap:4px;
-}
-.port-card .port-num{font-size:18px;font-weight:700;color:var(--green);font-family:var(--font)}
-.port-card .port-svc{font-size:12px;color:var(--cyan)}
-.port-card .port-banner{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all;font-family:var(--font)}
-
-/* ─── Vuln severity ──────────────────────────────────────────── */
-.vuln-item{
-  background:var(--bg3);border-left:3px solid;border-radius:0 8px 8px 0;
-  padding:12px 14px;margin-bottom:8px;
-}
-.vuln-high{border-color:var(--red)}
-.vuln-medium{border-color:var(--orange)}
-.vuln-low{border-color:var(--yellow)}
-.vuln-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:4px}
-.vuln-meta{font-size:11px;color:var(--muted);font-family:var(--font)}
-
-/* ─── Dashboard stats ────────────────────────────────────────── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:18px 20px;
-}
-.stat-icon{font-size:22px;margin-bottom:8px}
-.stat-val{font-size:26px;font-weight:700;font-family:var(--font)}
-.stat-label{font-size:12px;color:var(--muted);margin-top:3px}
-.stat-green .stat-val{color:var(--green)}
-.stat-cyan .stat-val{color:var(--cyan)}
-.stat-purple .stat-val{color:#a78bfa}
-.stat-orange .stat-val{color:var(--orange)}
-
-/* ─── Progress/Spinner ───────────────────────────────────────── */
-.spinner{
-  display:none;width:20px;height:20px;border:2px solid rgba(0,229,160,.2);
-  border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;
-}
-.spinner.show{display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.progress-bar{
-  height:3px;background:var(--border);border-radius:2px;overflow:hidden;
-  margin-top:12px;display:none;
-}
-.progress-bar.show{display:block}
-.progress-fill{height:100%;background:var(--green);animation:prog 2s ease-in-out infinite alternate}
-@keyframes prog{from{width:5%}to{width:95%}}
-
-/* ─── Terminal box ───────────────────────────────────────────── */
-.terminal{
-  background:#000;border:1px solid #222;border-radius:8px;
-  padding:16px;font-family:var(--font);font-size:12px;color:#00e5a0;
-  min-height:120px;max-height:300px;overflow-y:auto;
-}
-.terminal .line{margin-bottom:3px}
-.terminal .prompt{color:#6ee7b7}
-.terminal .cmd{color:#fff}
-
-/* ─── Disclaimer banner ──────────────────────────────────────── */
-.disclaimer{
-  background:rgba(255,165,2,.07);border:1px solid rgba(255,165,2,.2);
-  border-radius:8px;padding:12px 16px;margin-bottom:16px;
-  font-size:12px;color:var(--orange);display:flex;align-items:flex-start;gap:10px;
-}
-
-/* ─── Responsive ─────────────────────────────────────────────── */
-@media(max-width:768px){
-  .sidebar{width:60px;min-width:60px}
-  .sidebar .logo-text,.nav-btn span,.nav-label,.sidebar-footer{display:none}
-  .main{margin-left:60px;padding:16px}
-  .stat-grid{grid-template-columns:repeat(2,1fr)}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description"
+    content="CyberGuard Pro — Professional cybersecurity toolkit with file integrity checking, web vulnerability scanning, network reconnaissance, and AES-256 encryption." />
+  <title>CyberGuard Pro — Cybersecurity Suite</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
-<div class="layout">
-
-<!-- ══════════════ SIDEBAR ══════════════ -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">🛡️</div>
-    <div class="logo-text">
-      <h2>CyberGuard</h2>
-      <span>Pro v1.0</span>
-    </div>
-  </div>
-
-  <nav class="nav">
-    <div class="nav-group">
-      <div class="nav-label">Overview</div>
-      <button class="nav-btn active" onclick="nav('dashboard')">
-        <span class="icon">📊</span><span>Dashboard</span>
-      </button>
-    </div>
-    <div class="nav-group">
-      <div class="nav-label">Security Tools</div>
-      <button class="nav-btn" onclick="nav('integrity')">
-        <span class="icon">🔍</span><span>File Integrity</span>
-        <span class="badge">T1</span>
-      </button>
-      <button class="nav-btn" onclick="nav('scanner')">
-        <span class="icon">🌐</span><span>Vuln Scanner</span>
-        <span class="badge">T2</span>
-      </button>
-      <button class="nav-btn" onclick="nav('recon')">
-        <span class="icon">📡</span><span>Network Recon</span>
-        <span class="badge">T3</span>
-      </button>
-      <button class="nav-btn" onclick="nav('encrypt')">
-        <span class="icon">🔐</span><span>Encryption</span>
-        <span class="badge">T4</span>
-      </button>
-    </div>
-  </nav>
-
-  <div class="sidebar-footer">
-    <span class="status-dot"></span>All systems online<br/>
-    <span style="font-size:10px;">CodTech Internship 2025</span>
-  </div>
-</aside>
-
-<!-- ══════════════ MAIN ══════════════ -->
-<main class="main">
-
-  <!-- ── DASHBOARD ── -->
-  <div id="page-dashboard" class="page active">
-    <div class="page-header">
-      <h1>🛡️ CyberGuard Pro</h1>
-      <p>Unified cybersecurity toolkit — file integrity · web scanning · network recon · encryption</p>
-    </div>
-
-    <div class="stat-grid">
-      <div class="stat-card stat-green">
-        <div class="stat-icon">🔍</div>
-        <div class="stat-val">SHA-512</div>
-        <div class="stat-label">File Hashing Algorithm</div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h2>CyberGuard</h2>
+          <span>Pro v2.0</span>
+        </div>
       </div>
-      <div class="stat-card stat-cyan">
-        <div class="stat-icon">🌐</div>
-        <div class="stat-val">7+</div>
-        <div class="stat-label">Vulnerability Checks</div>
+      <nav class="nav">
+        <div class="nav-group">
+          <div class="nav-label">Overview</div>
+          <button class="nav-btn active" onclick="nav('dashboard')">
+            <span class="icon">📊</span><span>Dashboard</span>
+          </button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Security Tools</div>
+          <button class="nav-btn" onclick="nav('integrity')">
+            <span class="icon">🔍</span><span>File Integrity</span>
+            <span class="badge">T1</span>
+          </button>
+          <button class="nav-btn" onclick="nav('scanner')">
+            <span class="icon">🌐</span><span>Vuln Scanner</span>
+            <span class="badge">T2</span>
+          </button>
+          <button class="nav-btn" onclick="nav('recon')">
+            <span class="icon">📡</span><span>Network Recon</span>
+            <span class="badge">T3</span>
+          </button>
+          <button class="nav-btn" onclick="nav('encrypt')">
+            <span class="icon">🔐</span><span>Encryption</span>
+            <span class="badge">T4</span>
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>All systems online<br />
+        <span style="font-size:10px;">CODTECH IT SOLUTIONS Internship 2026</span>
       </div>
-      <div class="stat-card stat-purple">
-        <div class="stat-icon">📡</div>
-        <div class="stat-val">17</div>
-        <div class="stat-label">Known Ports Scanned</div>
-      </div>
-      <div class="stat-card stat-orange">
-        <div class="stat-icon">🔐</div>
-        <div class="stat-val">AES-256</div>
-        <div class="stat-label">Encryption Standard</div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-      <div class="card">
-        <div class="card-title">About This Project</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7">
-          CyberGuard Pro combines all four CodTech cybersecurity internship tasks
-          into a single, cohesive full-stack application. Each tool is accessible
-          from the sidebar and communicates with a Python Flask REST API backend.
-        </p>
-        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-            <span class="pill pill-green">Task 1</span> File Integrity Checker — hashlib (MD5·SHA1·SHA256·SHA512)
+    </aside>
+    <main class="main">
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>🛡️ CyberGuard Pro</h1>
+          <p>Unified cybersecurity toolkit — file integrity · web scanning · network recon · encryption</p>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card stat-green">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-val">SHA-512</div>
+            <div class="stat-label">File Hashing Algorithm</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-            <span class="pill pill-cyan">Task 2</span> Web Vulnerability Scanner — requests + BeautifulSoup
+          <div class="stat-card stat-cyan">
+            <div class="stat-icon">🌐</div>
+            <div class="stat-val">7+</div>
+            <div class="stat-label">Vulnerability Checks</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-            <span class="pill pill-orange">Task 3</span> Network Recon Toolkit — socket + threading
+          <div class="stat-card stat-purple">
+            <div class="stat-icon">📡</div>
+            <div class="stat-val">17</div>
+            <div class="stat-label">Known Ports Scanned</div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-            <span class="pill pill-green" style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.25)">Task 4</span> AES-256 File Encryption — cryptography (PBKDF2)
+          <div class="stat-card stat-orange">
+            <div class="stat-icon">🔐</div>
+            <div class="stat-val">AES-256</div>
+            <div class="stat-label">Encryption Standard</div>
           </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Tech Stack</div>
-        <div class="terminal" id="term-boot">
-          <div class="line"><span class="prompt">$</span> <span class="cmd">python app.py</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="card">
+            <div class="card-title">About This Project</div>
+            <p style="font-size:13px;color:var(--muted);line-height:1.7">
+              CyberGuard Pro combines all four CodTech cybersecurity internship tasks
+              into a single, cohesive full-stack application. Each tool is accessible
+              from the sidebar and communicates with a Python Flask REST API backend.
+              All results can be downloaded as structured PDF reports.
+            </p>
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+                <span class="pill pill-green">Task 1</span> File Integrity Checker — hashlib (MD5·SHA1·SHA256·SHA512)
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+                <span class="pill pill-cyan">Task 2</span> Web Vulnerability Scanner — requests + BeautifulSoup
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+                <span class="pill pill-orange">Task 3</span> Network Recon Toolkit — socket + threading
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+                <span class="pill pill-green"
+                  style="background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.25)">Task 4</span>
+                AES-256 File Encryption — cryptography (PBKDF2)
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;margin-top:4px">
+                <span class="pill pill-cyan"
+                  style="background:rgba(124,58,237,.12);color:#c084fc;border-color:rgba(124,58,237,.25)">NEW</span> PDF
+                Report Downloads — ReportLab
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Tech Stack</div>
+            <div class="terminal" id="term-boot">
+              <div class="line"><span class="prompt">$</span> <span class="cmd">python app.py</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="card-title">Quick Actions</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="nav('integrity')">🔍 Check File Integrity</button>
+            <button class="btn btn-secondary" onclick="nav('scanner')">🌐 Scan a Website</button>
+            <button class="btn btn-secondary" onclick="nav('recon')">📡 Port Scan</button>
+            <button class="btn btn-secondary" onclick="nav('encrypt')">🔐 Encrypt a File</button>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="card" style="margin-top:0">
-      <div class="card-title">Quick Actions</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="nav('integrity')">🔍 Check File Integrity</button>
-        <button class="btn btn-secondary" onclick="nav('scanner')">🌐 Scan a Website</button>
-        <button class="btn btn-secondary" onclick="nav('recon')">📡 Port Scan</button>
-        <button class="btn btn-secondary" onclick="nav('encrypt')">🔐 Encrypt a File</button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── TASK 1: FILE INTEGRITY ── -->
-  <div id="page-integrity" class="page">
-    <div class="page-header">
-      <h1>🔍 File Integrity Checker</h1>
-      <p>Compute cryptographic hashes and detect unauthorized file modifications</p>
-    </div>
-
-    <!-- Hash Compute -->
-    <div class="card">
-      <div class="card-title">Compute Hashes</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Select File</label>
-          <input type="file" id="hash-file"/>
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="computeHash()">
-        <span id="hash-spinner" class="spinner"></span> Compute Hashes
-      </button>
-
-      <div style="margin-top:14px" id="hash-result-wrap">
-        <table class="hash-table" id="hash-table" style="display:none">
-          <thead>
-            <tr><th>Algorithm</th><th>Hash Value</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="hash-meta" style="margin-top:8px;font-size:12px;color:var(--muted);font-family:var(--font)"></div>
-      </div>
-    </div>
-
-    <!-- Baseline -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-      <div class="card">
-        <div class="card-title">💾 Save Baseline</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>File to Baseline</label>
-          <input type="file" id="baseline-file"/>
-        </div>
-        <button class="btn btn-primary" onclick="saveBaseline()">
-          <span id="bl-spinner" class="spinner"></span> Save Baseline
-        </button>
-        <div class="result-area" id="bl-result"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">✅ Verify Integrity</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>File to Verify</label>
-          <input type="file" id="check-file"/>
-        </div>
-        <button class="btn btn-primary" onclick="checkIntegrity()">
-          <span id="chk-spinner" class="spinner"></span> Check Integrity
-        </button>
-        <div class="result-area" id="chk-result"></div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── TASK 2: VULN SCANNER ── -->
-  <div id="page-scanner" class="page">
-    <div class="page-header">
-      <h1>🌐 Web Vulnerability Scanner</h1>
-      <p>Detect SQL injection, XSS, missing security headers, exposed paths, and SSL issues</p>
-    </div>
-
-    <div class="disclaimer">
-      ⚠️ <div><strong>Authorized Use Only.</strong> Only scan websites you own or have explicit written permission to test. Unauthorized scanning may violate laws.</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Target Configuration</div>
-      <div class="form-row">
-        <div class="form-group" style="flex:2">
-          <label>Target URL</label>
-          <input type="text" id="scan-url" placeholder="https://example.com" />
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-primary" onclick="runScan()">
-          <span id="scan-spinner" class="spinner"></span> Start Scan
-        </button>
-        <span id="scan-status" style="font-size:12px;color:var(--muted)"></span>
-      </div>
-      <div class="progress-bar" id="scan-progress"><div class="progress-fill"></div></div>
-    </div>
-
-    <div id="scan-results" style="display:none">
-      <!-- Risk Badge -->
-      <div class="card" id="scan-risk-card">
-        <div class="card-title">Scan Summary</div>
-        <div id="scan-risk-content"></div>
-      </div>
-
-      <!-- Vulnerabilities -->
-      <div class="card" id="scan-vuln-card">
-        <div class="card-title">Vulnerabilities Found</div>
-        <div id="scan-vulns"></div>
-      </div>
-
-      <!-- Security Headers -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-        <div class="card">
-          <div class="card-title" style="color:var(--red)">Missing Headers</div>
-          <div id="missing-headers"></div>
+      <div id="page-integrity" class="page">
+        <div class="page-header">
+          <h1>🔍 File Integrity Checker</h1>
+          <p>Compute cryptographic hashes and detect unauthorized file modifications</p>
         </div>
         <div class="card">
-          <div class="card-title">Present Headers</div>
-          <div id="present-headers"></div>
+          <div class="card-title">Compute Hashes</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Select File</label>
+              <input type="file" id="hash-file" />
+            </div>
+          </div>
+          <div class="action-toolbar">
+            <button class="btn btn-primary" onclick="computeHash()">
+              <span id="hash-spinner" class="spinner"></span> Compute Hashes
+            </button>
+            <button id="btn-dl-hash" class="btn-download hidden" onclick="downloadHashPDF()">
+              📄 Download PDF Report
+            </button>
+          </div>
+          <div style="margin-top:14px" id="hash-result-wrap">
+            <table class="hash-table" id="hash-table" style="display:none">
+              <thead>
+                <tr>
+                  <th>Algorithm</th>
+                  <th>Hash Value</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div id="hash-meta" style="margin-top:8px;font-size:12px;color:var(--muted);font-family:var(--font)"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="card">
+            <div class="card-title">💾 Save Baseline</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>File to Baseline</label>
+              <input type="file" id="baseline-file" />
+            </div>
+            <button class="btn btn-primary" onclick="saveBaseline()">
+              <span id="bl-spinner" class="spinner"></span> Save Baseline
+            </button>
+            <div class="result-area" id="bl-result"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">✅ Verify Integrity</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>File to Verify</label>
+              <input type="file" id="check-file" />
+            </div>
+            <div class="action-toolbar">
+              <button class="btn btn-primary" onclick="checkIntegrity()">
+                <span id="chk-spinner" class="spinner"></span> Check Integrity
+              </button>
+              <button id="btn-dl-integrity" class="btn-download hidden" onclick="downloadIntegrityPDF()">
+                📄 Download PDF Report
+              </button>
+            </div>
+            <div class="result-area" id="chk-result"></div>
+          </div>
         </div>
       </div>
-
-      <!-- SSL + Info -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div id="page-scanner" class="page">
+        <div class="page-header">
+          <h1>🌐 Web Vulnerability Scanner</h1>
+          <p>Detect SQL injection, XSS, missing security headers, exposed paths, and SSL issues</p>
+        </div>
+        <div class="disclaimer">
+          ⚠️ <div><strong>Authorized Use Only.</strong> Only scan websites you own or have explicit written permission
+            to test. Unauthorized scanning may violate laws.</div>
+        </div>
         <div class="card">
-          <div class="card-title">SSL / TLS Info</div>
-          <div id="ssl-info"></div>
+          <div class="card-title">Target Configuration</div>
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label>Target URL</label>
+              <input type="text" id="scan-url" placeholder="https://example.com" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="runScan()">
+              <span id="scan-spinner" class="spinner"></span> Start Scan
+            </button>
+            <button id="btn-dl-scan" class="btn-download hidden" onclick="downloadScanPDF()">
+              📄 Download PDF Report
+            </button>
+            <span id="scan-status" style="font-size:12px;color:var(--muted)"></span>
+          </div>
+          <div class="progress-bar" id="scan-progress">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <div id="scan-results" style="display:none">
+          <div class="card" id="scan-risk-card">
+            <div class="card-title">Scan Summary</div>
+            <div id="scan-risk-content"></div>
+          </div>
+          <div class="card" id="scan-vuln-card">
+            <div class="card-title">Vulnerabilities Found</div>
+            <div id="scan-vulns"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+            <div class="card">
+              <div class="card-title" style="color:var(--red)">Missing Headers</div>
+              <div id="missing-headers"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Present Headers</div>
+              <div id="present-headers"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+            <div class="card">
+              <div class="card-title">SSL / TLS Info</div>
+              <div id="ssl-info"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Page Information</div>
+              <div id="page-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-recon" class="page">
+        <div class="page-header">
+          <h1>📡 Network Recon Toolkit</h1>
+          <p>Port scanning, DNS resolution, host reachability — for authorized penetration testing</p>
+        </div>
+        <div class="disclaimer">
+          ⚠️ <div><strong>Authorized Use Only.</strong> Only scan systems you own or have explicit permission to test.
+          </div>
+        </div>
+        <div style="margin-bottom:16px">
+          <button id="btn-dl-recon" class="btn-download hidden" onclick="downloadReconPDF()">
+            📄 Download Full Recon PDF Report
+          </button>
         </div>
         <div class="card">
-          <div class="card-title">Page Information</div>
-          <div id="page-info"></div>
+          <div class="card-title">Port Scanner</div>
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label>Target Host / IP</label>
+              <input type="text" id="ps-host" placeholder="scanme.nmap.org or 192.168.1.1" />
+            </div>
+            <div class="form-group">
+              <label>Scan Mode</label>
+              <select id="ps-mode">
+                <option value="common">Common Ports (17 ports)</option>
+                <option value="top200">Top 200 Ports</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn btn-primary" onclick="runPortScan()">
+              <span id="ps-spinner" class="spinner"></span> Start Port Scan
+            </button>
+            <span id="ps-status" style="font-size:12px;color:var(--muted)"></span>
+          </div>
+          <div class="progress-bar" id="ps-progress">
+            <div class="progress-fill"></div>
+          </div>
+          <div id="ps-results" style="margin-top:14px"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="card">
+            <div class="card-title">DNS Lookup</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Domain</label>
+              <input type="text" id="dns-domain" placeholder="google.com" />
+            </div>
+            <button class="btn btn-primary" onclick="runDNS()">
+              <span id="dns-spinner" class="spinner"></span> Lookup
+            </button>
+            <div class="result-area" id="dns-result"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Host Ping / Reachability</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Host / IP</label>
+              <input type="text" id="ping-host" placeholder="8.8.8.8" />
+            </div>
+            <button class="btn btn-primary" onclick="runPing()">
+              <span id="ping-spinner" class="spinner"></span> Ping
+            </button>
+            <div class="result-area" id="ping-result"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
+          <div class="card">
+            <div class="card-title">Subdomain Enumeration</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Domain</label>
+              <input type="text" id="sub-domain" placeholder="example.com" />
+            </div>
+            <button class="btn btn-primary" onclick="runSubdomains()">
+              <span id="sub-spinner" class="spinner"></span> Find Subdomains
+            </button>
+            <div class="result-area" id="sub-result"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">IP Geolocation</div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Target IP / Domain</label>
+              <input type="text" id="geo-target" placeholder="8.8.8.8" />
+            </div>
+            <button class="btn btn-primary" onclick="runGeoIP()">
+              <span id="geo-spinner" class="spinner"></span> Get Location
+            </button>
+            <div class="result-area" id="geo-result"></div>
+          </div>
         </div>
       </div>
-    </div>
+      <div id="page-encrypt" class="page">
+        <div class="page-header">
+          <h1>🔐 Advanced Encryption Tool</h1>
+          <p>AES-256-CBC encryption with PBKDF2-HMAC-SHA256 key derivation (120,000 iterations)</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div class="card">
+            <div class="card-title">🔒 Encrypt File</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>File to Encrypt</label>
+              <input type="file" id="enc-file" />
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Password</label>
+              <input type="password" id="enc-pass" placeholder="Strong password…" />
+            </div>
+            <div class="action-toolbar">
+              <button class="btn btn-primary" onclick="encryptFile()">
+                <span id="enc-spinner" class="spinner"></span> Encrypt & Download
+              </button>
+              <button id="btn-dl-encrypt" class="btn-download hidden" onclick="downloadEncryptPDF()">
+                📄 PDF Report
+              </button>
+            </div>
+            <div class="result-area" id="enc-result"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">🔓 Decrypt File</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label>Encrypted File (.enc)</label>
+              <input type="file" id="dec-file" />
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Password</label>
+              <input type="password" id="dec-pass" placeholder="Your password…" />
+            </div>
+            <div class="action-toolbar">
+              <button class="btn btn-primary" onclick="decryptFile()">
+                <span id="dec-spinner" class="spinner"></span> Decrypt & Download
+              </button>
+              <button id="btn-dl-decrypt" class="btn-download hidden" onclick="downloadEncryptPDF()">
+                📄 PDF Report
+              </button>
+            </div>
+            <div class="result-area" id="dec-result"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔬 How AES-256-CBC Works</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
+            <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
+              <div style="font-size:22px;margin-bottom:8px">🔑</div>
+              <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">Key Derivation</div>
+              <div style="font-size:11px;color:var(--muted)">PBKDF2-HMAC-SHA256 · 120k iterations · 16-byte random salt
+              </div>
+            </div>
+            <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
+              <div style="font-size:22px;margin-bottom:8px">🎲</div>
+              <div style="font-size:12px;font-weight:600;color:var(--cyan);margin-bottom:4px">Random IV</div>
+              <div style="font-size:11px;color:var(--muted)">16-byte random IV generated per encryption — no determinism
+              </div>
+            </div>
+            <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
+              <div style="font-size:22px;margin-bottom:8px">⚙️</div>
+              <div style="font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:4px">AES-256-CBC</div>
+              <div style="font-size:11px;color:var(--muted)">256-bit key · PKCS7 padding · industry-standard cipher
+              </div>
+            </div>
+            <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
+              <div style="font-size:22px;margin-bottom:8px">📦</div>
+              <div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:4px">File Format</div>
+              <div style="font-size:11px;color:var(--muted)">MAGIC(9) + SALT(16) + IV(16) + CIPHERTEXT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
-
-
-  <!-- ── TASK 3: NETWORK RECON ── -->
-  <div id="page-recon" class="page">
-    <div class="page-header">
-      <h1>📡 Network Recon Toolkit</h1>
-      <p>Port scanning, DNS resolution, host reachability — for authorized penetration testing</p>
-    </div>
-
-    <div class="disclaimer">
-      ⚠️ <div><strong>Authorized Use Only.</strong> Only scan systems you own or have explicit permission to test.</div>
-    </div>
-
-    <!-- Port Scanner -->
-    <div class="card">
-      <div class="card-title">Port Scanner</div>
-      <div class="form-row">
-        <div class="form-group" style="flex:2">
-          <label>Target Host / IP</label>
-          <input type="text" id="ps-host" placeholder="scanme.nmap.org or 192.168.1.1"/>
-        </div>
-        <div class="form-group">
-          <label>Scan Mode</label>
-          <select id="ps-mode">
-            <option value="common">Common Ports (17 ports)</option>
-            <option value="top200">Top 200 Ports</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-primary" onclick="runPortScan()">
-          <span id="ps-spinner" class="spinner"></span> Start Port Scan
-        </button>
-        <span id="ps-status" style="font-size:12px;color:var(--muted)"></span>
-      </div>
-      <div class="progress-bar" id="ps-progress"><div class="progress-fill"></div></div>
-      <div id="ps-results" style="margin-top:14px"></div>
-    </div>
-
-    <!-- DNS + Ping side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-      <div class="card">
-        <div class="card-title">DNS Lookup</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Domain</label>
-          <input type="text" id="dns-domain" placeholder="google.com"/>
-        </div>
-        <button class="btn btn-primary" onclick="runDNS()">
-          <span id="dns-spinner" class="spinner"></span> Lookup
-        </button>
-        <div class="result-area" id="dns-result"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Host Ping / Reachability</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Host / IP</label>
-          <input type="text" id="ping-host" placeholder="8.8.8.8"/>
-        </div>
-        <button class="btn btn-primary" onclick="runPing()">
-          <span id="ping-spinner" class="spinner"></span> Ping
-        </button>
-        <div class="result-area" id="ping-result"></div>
-      </div>
-    </div>
-
-    <!-- NEW: Subdomains + GeoIP side by side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px">
-      <div class="card">
-        <div class="card-title">Subdomain Enumeration</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Domain</label>
-          <input type="text" id="sub-domain" placeholder="example.com"/>
-        </div>
-        <button class="btn btn-primary" onclick="runSubdomains()">
-          <span id="sub-spinner" class="spinner"></span> Find Subdomains
-        </button>
-        <div class="result-area" id="sub-result"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">IP Geolocation</div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Target IP / Domain</label>
-          <input type="text" id="geo-target" placeholder="8.8.8.8"/>
-        </div>
-        <button class="btn btn-primary" onclick="runGeoIP()">
-          <span id="geo-spinner" class="spinner"></span> Get Location
-        </button>
-        <div class="result-area" id="geo-result"></div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── TASK 4: ENCRYPTION ── -->
-  <div id="page-encrypt" class="page">
-    <div class="page-header">
-      <h1>🔐 Advanced Encryption Tool</h1>
-      <p>AES-256-CBC encryption with PBKDF2-HMAC-SHA256 key derivation (120,000 iterations)</p>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-      <!-- Encrypt -->
-      <div class="card">
-        <div class="card-title">🔒 Encrypt File</div>
-        <div class="form-group" style="margin-bottom:12px">
-          <label>File to Encrypt</label>
-          <input type="file" id="enc-file"/>
-        </div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Password</label>
-          <input type="password" id="enc-pass" placeholder="Strong password…"/>
-        </div>
-        <button class="btn btn-primary" onclick="encryptFile()">
-          <span id="enc-spinner" class="spinner"></span> Encrypt & Download
-        </button>
-        <div class="result-area" id="enc-result"></div>
-      </div>
-
-      <!-- Decrypt -->
-      <div class="card">
-        <div class="card-title">🔓 Decrypt File</div>
-        <div class="form-group" style="margin-bottom:12px">
-          <label>Encrypted File (.enc)</label>
-          <input type="file" id="dec-file"/>
-        </div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Password</label>
-          <input type="password" id="dec-pass" placeholder="Your password…"/>
-        </div>
-        <button class="btn btn-primary" onclick="decryptFile()">
-          <span id="dec-spinner" class="spinner"></span> Decrypt & Download
-        </button>
-        <div class="result-area" id="dec-result"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">🔬 How AES-256-CBC Works</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px">
-        <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
-          <div style="font-size:22px;margin-bottom:8px">🔑</div>
-          <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">Key Derivation</div>
-          <div style="font-size:11px;color:var(--muted)">PBKDF2-HMAC-SHA256 · 120k iterations · 16-byte random salt</div>
-        </div>
-        <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
-          <div style="font-size:22px;margin-bottom:8px">🎲</div>
-          <div style="font-size:12px;font-weight:600;color:var(--cyan);margin-bottom:4px">Random IV</div>
-          <div style="font-size:11px;color:var(--muted)">16-byte random IV generated per encryption — no determinism</div>
-        </div>
-        <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
-          <div style="font-size:22px;margin-bottom:8px">⚙️</div>
-          <div style="font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:4px">AES-256-CBC</div>
-          <div style="font-size:11px;color:var(--muted)">256-bit key · PKCS7 padding · industry-standard cipher</div>
-        </div>
-        <div style="text-align:center;padding:14px;background:var(--bg3);border-radius:8px">
-          <div style="font-size:22px;margin-bottom:8px">📦</div>
-          <div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:4px">File Format</div>
-          <div style="font-size:11px;color:var(--muted)">MAGIC(9) + SALT(16) + IV(16) + CIPHERTEXT</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</main>
-</div>
-
-<!-- ══════════════ JAVASCRIPT ══════════════ -->
-<script>
-// ─── Navigation ──────────────────────────────────────────────
-function nav(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-
-// ─── Boot terminal animation ──────────────────────────────────
-const bootLines = [
-  ['$ ', 'Starting CyberGuard Pro...'],
-  ['✓ ', 'Flask API: http://localhost:5000'],
-  ['✓ ', 'hashlib → File Integrity module ready'],
-  ['✓ ', 'requests + bs4 → Vuln Scanner ready'],
-  ['✓ ', 'socket + threading → Port Scanner ready'],
-  ['✓ ', 'cryptography → AES-256 Encryption ready'],
-  ['★ ', 'All 4 modules online. Ready.'],
-];
-let li = 0;
-const term = document.getElementById('term-boot');
-function bootLine() {
-  if (li >= bootLines.length) return;
-  const [prefix, text] = bootLines[li++];
-  const d = document.createElement('div');
-  d.className = 'line';
-  d.innerHTML = `<span class="prompt">${prefix}</span><span class="cmd">${text}</span>`;
-  term.appendChild(d);
-  term.scrollTop = term.scrollHeight;
-  setTimeout(bootLine, 340);
-}
-setTimeout(bootLine, 500);
-
-// ─── Helpers ──────────────────────────────────────────────────
-function showSpinner(id, show) {
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('show', show);
-}
-function showProgress(id, show) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = show ? 'block' : 'none';
-}
-function showResult(id, html) {
-  const el = document.getElementById(id);
-  el.innerHTML = html;
-  el.classList.add('show');
-}
-function riskColor(r) {
-  return r === 'HIGH' ? 'red' : r === 'MEDIUM' ? 'orange' : 'green';
-}
-
-// ═══════════════════════════════════════════
-// TASK 1 — FILE INTEGRITY
-// ═══════════════════════════════════════════
-
-async function computeHash() {
-  const file = document.getElementById('hash-file').files[0];
-  if (!file) return alert('Please select a file.');
-
-  showSpinner('hash-spinner', true);
-  const form = new FormData();
-  form.append('file', file);
-
-  try {
-    const res = await fetch('/api/hash', { method: 'POST', body: form });
-    const d = await res.json();
-    showSpinner('hash-spinner', false);
-
-    const table = document.getElementById('hash-table');
-    const tbody = table.querySelector('tbody');
-    table.style.display = 'table';
-    tbody.innerHTML = ['md5','sha1','sha256','sha512'].map(algo => `
-      <tr>
-        <td style="color:var(--cyan);font-weight:600;white-space:nowrap">${algo.toUpperCase()}</td>
-        <td style="color:var(--green)">${d[algo]}</td>
-      </tr>
-    `).join('');
-
-    document.getElementById('hash-meta').textContent =
-      `File: ${d.filename} · Size: ${(d.size_bytes/1024).toFixed(2)} KB · ${d.timestamp}`;
-  } catch(e) {
-    showSpinner('hash-spinner', false);
-    alert('Error: ' + e.message);
-  }
-}
-
-async function saveBaseline() {
-  const file = document.getElementById('baseline-file').files[0];
-  if (!file) return alert('Please select a file.');
-
-  showSpinner('bl-spinner', true);
-  const form = new FormData();
-  form.append('file', file);
-
-  const res = await fetch('/api/integrity/save', { method: 'POST', body: form });
-  const d = await res.json();
-  showSpinner('bl-spinner', false);
-
-  showResult('bl-result', d.error
-    ? `<span class="err">❌ ${d.error}</span>`
-    : `<span class="ok">✅ Baseline saved for '${file.name}'</span>\n` +
-      Object.entries(d.hashes).map(([k,v]) => `<span class="key">${k.toUpperCase()}</span>: ${v}`).join('\n')
-  );
-}
-
-async function checkIntegrity() {
-  const file = document.getElementById('check-file').files[0];
-  if (!file) return alert('Please select a file.');
-
-  showSpinner('chk-spinner', true);
-  const form = new FormData();
-  form.append('file', file);
-
-  const res = await fetch('/api/integrity/check', { method: 'POST', body: form });
-  const d = await res.json();
-  showSpinner('chk-spinner', false);
-
-  if (d.error) {
-    showResult('chk-result', `<span class="err">❌ ${d.error}</span>`);
-    return;
-  }
-
-  let html = d.intact
-    ? `<span class="ok">✅ File is INTACT — No changes detected</span>\n`
-    : `<span class="err">⚠️  File has been MODIFIED — ${d.changes.length} hash(es) changed</span>\n`;
-
-  html += `\n<span class="info">── Current Hashes ──</span>\n`;
-  for (const [k,v] of Object.entries(d.current_hashes)) {
-    const changed = d.changes.some(c => c.algo === k);
-    html += `<span class="key">${k.toUpperCase()}</span>: <span class="${changed?'err':'ok'}">${v}</span>\n`;
-  }
-  if (d.changes.length) {
-    html += `\n<span class="warn">── Baseline Values (original) ──</span>\n`;
-    for (const c of d.changes) {
-      html += `<span class="key">${c.algo.toUpperCase()}</span>: <span class="warn">${c.baseline}</span>\n`;
-    }
-  }
-  showResult('chk-result', html);
-}
-
-// ═══════════════════════════════════════════
-// TASK 2 — VULN SCANNER
-// ═══════════════════════════════════════════
-
-async function runScan() {
-  const url = document.getElementById('scan-url').value.trim();
-  if (!url) return alert('Please enter a URL.');
-
-  showSpinner('scan-spinner', true);
-  showProgress('scan-progress', true);
-  document.getElementById('scan-status').textContent = 'Scanning… this may take 10–20 seconds';
-  document.getElementById('scan-results').style.display = 'none';
-
-  const res = await fetch('/api/scan', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({url})
-  });
-  const d = await res.json();
-
-  showSpinner('scan-spinner', false);
-  showProgress('scan-progress', false);
-  document.getElementById('scan-status').textContent = `Done · ${d.summary?.total||0} issue(s) found`;
-  document.getElementById('scan-results').style.display = 'block';
-
-  const rc = riskColor(d.risk);
-
-  // Risk summary
-  document.getElementById('scan-risk-content').innerHTML = `
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <div class="pill pill-${rc==='green'?'green':rc==='orange'?'orange':'red'}">
-        ${d.risk} RISK
-      </div>
-      <div style="font-size:13px;color:var(--muted)">
-        ${d.summary?.total||0} total issues ·
-        <span style="color:var(--red)">${d.summary?.high||0} HIGH</span> ·
-        <span style="color:var(--orange)">${d.summary?.medium||0} MEDIUM</span> ·
-        ${d.summary?.missing_headers||0} missing headers
-      </div>
-    </div>
-    ${(d.info||[]).map(i=>`<div style="font-size:12px;color:var(--muted);margin-top:6px;font-family:var(--font)">${i}</div>`).join('')}
-  `;
-
-  // Vulnerabilities
-  const vulnEl = document.getElementById('scan-vulns');
-  if (!d.vulnerabilities?.length) {
-    vulnEl.innerHTML = '<span style="color:var(--green);font-size:13px">✅ No direct vulnerabilities detected in forms.</span>';
-  } else {
-    vulnEl.innerHTML = d.vulnerabilities.map(v => `
-      <div class="vuln-item vuln-${(v.severity||'medium').toLowerCase()}">
-        <div class="vuln-title">${v.type} <span class="pill pill-${v.severity==='HIGH'?'red':'orange'}" style="font-size:10px">${v.severity}</span></div>
-        <div class="vuln-meta">${v.form||v.path||''} ${v.payload?'· payload: '+v.payload:''} ${v.evidence?'· evidence: '+v.evidence:''}</div>
-      </div>
-    `).join('');
-  }
-
-  // Missing headers
-  const mh = d.headers?.missing||[];
-  document.getElementById('missing-headers').innerHTML = mh.length
-    ? mh.map(h=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
-        <span style="color:var(--red)">✗</span>
-        <span style="color:var(--text);font-family:var(--font)">${h.header}</span>
-      </div>`).join('')
-    : '<span style="color:var(--green);font-size:13px">✅ All security headers present!</span>';
-
-  // Present headers
-  const ph = d.headers?.present||[];
-  document.getElementById('present-headers').innerHTML = ph.map(h=>`
-    <div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
-      <span style="color:var(--green)">✓</span>
-      <span style="color:var(--text);font-family:var(--font);margin-left:8px">${h.header}</span>
-    </div>`).join('') || '<span style="color:var(--muted)">None</span>';
-
-  // SSL
-  const ssl = d.ssl||{};
-  document.getElementById('ssl-info').innerHTML = `
-    <div style="font-size:13px;margin-bottom:8px">
-      ${ssl.has_ssl
-        ? `<span class="pill pill-green">✅ HTTPS Enabled</span>`
-        : `<span class="pill pill-red">❌ HTTP Only</span>`}
-    </div>
-    ${ssl.version?`<div style="font-size:12px;color:var(--muted);font-family:var(--font)">Version: ${ssl.version}</div>`:''}
-    ${ssl.cipher?`<div style="font-size:12px;color:var(--muted);font-family:var(--font)">Cipher: ${ssl.cipher}</div>`:''}
-    ${(ssl.issues||[]).map(i=>`<div style="font-size:12px;color:var(--red);margin-top:4px">⚠ ${i}</div>`).join('')}
-  `;
-
-  // Page info
-  document.getElementById('page-info').innerHTML = (d.info||[]).map(i=>
-    `<div style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--font);color:var(--muted)">${i}</div>`
-  ).join('');
-}
-
-// ═══════════════════════════════════════════
-// TASK 3 — NETWORK RECON
-// ═══════════════════════════════════════════
-
-async function runPortScan() {
-  const host = document.getElementById('ps-host').value.trim();
-  const mode = document.getElementById('ps-mode').value;
-  if (!host) return alert('Please enter a host.');
-
-  showSpinner('ps-spinner', true);
-  showProgress('ps-progress', true);
-  document.getElementById('ps-status').textContent = 'Scanning… please wait';
-  document.getElementById('ps-results').innerHTML = '';
-
-  const res = await fetch('/api/portscan', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({host, mode})
-  });
-  const d = await res.json();
-
-  showSpinner('ps-spinner', false);
-  showProgress('ps-progress', false);
-
-  if (d.error) {
-    document.getElementById('ps-status').textContent = '❌ ' + d.error;
-    return;
-  }
-
-  document.getElementById('ps-status').textContent =
-    `${d.total_open} open port(s) found · ${d.ports_scanned} scanned · ${d.duration_s}s`;
-
-  const el = document.getElementById('ps-results');
-  if (!d.open_ports.length) {
-    el.innerHTML = '<span style="color:var(--muted);font-size:13px">No open ports found in selected range.</span>';
-    return;
-  }
-
-  el.innerHTML = `
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-family:var(--font)">
-      Host: <span style="color:var(--cyan)">${d.host}</span> → IP: <span style="color:var(--green)">${d.ip}</span>
-    </div>
-    <div class="port-grid">
-      ${d.open_ports.map(p=>`
-        <div class="port-card">
-          <div class="port-num">${p.port}</div>
-          <div class="port-svc">${p.service}</div>
-          <div style="margin-top:4px"><span class="pill pill-green" style="font-size:10px">OPEN</span></div>
-          ${p.banner?`<div class="port-banner">${p.banner}</div>`:''}
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-async function runDNS() {
-  const domain = document.getElementById('dns-domain').value.trim();
-  if (!domain) return alert('Please enter a domain.');
-
-  showSpinner('dns-spinner', true);
-  const res = await fetch('/api/dns', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({domain})
-  });
-  const d = await res.json();
-  showSpinner('dns-spinner', false);
-
-  if (d.error) {
-    showResult('dns-result', `<span class="err">❌ ${d.error}</span>`);
-    return;
-  }
-
-  let html = `<span class="info">Domain: ${d.domain}</span>\n\n`;
-  for (const [type, val] of Object.entries(d.records||{})) {
-    html += `<span class="key">${type}</span>: <span class="ok">${val}</span>\n`;
-  }
-  if (d.all_ips?.length > 1) {
-    html += `\n<span class="info">All IPs:</span>\n` + d.all_ips.map(ip=>`  ${ip}`).join('\n');
-  }
-  showResult('dns-result', html);
-}
-
-async function runPing() {
-  const host = document.getElementById('ping-host').value.trim();
-  if (!host) return alert('Please enter a host.');
-
-  showSpinner('ping-spinner', true);
-  const res = await fetch('/api/ping', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({host})
-  });
-  const d = await res.json();
-  showSpinner('ping-spinner', false);
-
-  showResult('ping-result', d.reachable
-    ? `<span class="ok">✅ REACHABLE</span>\n\nHost: <span class="info">${d.host}</span>\nIP:   <span class="info">${d.ip}</span>\nLatency: <span class="ok">${d.latency_ms} ms</span>`
-    : `<span class="err">❌ UNREACHABLE</span>\n\nHost: <span class="info">${d.host}</span>\n${d.error||''}`
-  );
-}
-
-async function runSubdomains() {
-  const domain = document.getElementById('sub-domain').value.trim();
-  if (!domain) return alert('Please enter a domain.');
-
-  showSpinner('sub-spinner', true);
-  const res = await fetch('/api/subdomains', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({domain})
-  });
-  const d = await res.json();
-  showSpinner('sub-spinner', false);
-
-  if (d.error) {
-    showResult('sub-result', `<span class="err">❌ ${d.error}</span>`);
-    return;
-  }
-
-  let html = `<span class="info">Domain: ${d.domain}</span>\nFound: <span class="ok">${d.total||0}</span> subdomains\n\n`;
-  if (d.found && d.found.length > 0) {
-    for (const sub of d.found) {
-      html += `<span class="key">${sub.subdomain}</span>: <span class="info">${sub.ip}</span>\n`;
-    }
-  } else {
-    html += `<span class="warn">No common subdomains found.</span>`;
-  }
-  showResult('sub-result', html);
-}
-
-async function runGeoIP() {
-  const target = document.getElementById('geo-target').value.trim();
-  if (!target) return alert('Please enter a target.');
-
-  showSpinner('geo-spinner', true);
-  const res = await fetch('/api/geoip', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({target})
-  });
-  const d = await res.json();
-  showSpinner('geo-spinner', false);
-
-  if (d.error) {
-    showResult('geo-result', `<span class="err">❌ ${d.error}</span>`);
-    return;
-  }
-
-  let html = `<span class="info">Target: ${d.target}</span>\nIP: <span class="ok">${d.ip}</span>\n\n`;
-  html += `<span class="key">Country</span>: ${d.country || 'Unknown'}\n`;
-  html += `<span class="key">City</span>: ${d.city || 'Unknown'}\n`;
-  html += `<span class="key">ISP</span>: ${d.isp || 'Unknown'}\n`;
-  html += `<span class="key">Coords</span>: Lat ${d.lat}, Lon ${d.lon}\n`;
-  
-  showResult('geo-result', html);
-}
-
-// ═══════════════════════════════════════════
-// TASK 4 — ENCRYPTION
-// ═══════════════════════════════════════════
-
-async function encryptFile() {
-  const file = document.getElementById('enc-file').files[0];
-  const pass = document.getElementById('enc-pass').value;
-  if (!file) return alert('Please select a file.');
-  if (!pass) return alert('Please enter a password.');
-  if (pass.length < 6) return alert('Password must be at least 6 characters.');
-
-  showSpinner('enc-spinner', true);
-  showResult('enc-result', '<span class="info">Encrypting with AES-256-CBC…</span>');
-
-  const form = new FormData();
-  form.append('file', file);
-  form.append('password', pass);
-
-  const res = await fetch('/api/encrypt', { method:'POST', body: form });
-  showSpinner('enc-spinner', false);
-
-  if (!res.ok) {
-    const err = await res.json();
-    showResult('enc-result', `<span class="err">❌ ${err.error}</span>`);
-    return;
-  }
-
-  const blob = await res.blob();
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = file.name + '.enc';
-  a.click();
-  showResult('enc-result',
-    `<span class="ok">✅ File encrypted and downloaded!</span>\n\n` +
-    `Original: <span class="info">${file.name}</span>\nEncrypted: <span class="ok">${file.name}.enc</span>\n` +
-    `Algorithm: <span class="key">AES-256-CBC</span>\nKey derivation: <span class="key">PBKDF2-HMAC-SHA256</span>\nIterations: <span class="ok">120,000</span>`
-  );
-}
-
-async function decryptFile() {
-  const file = document.getElementById('dec-file').files[0];
-  const pass = document.getElementById('dec-pass').value;
-  if (!file) return alert('Please select a .enc file.');
-  if (!pass) return alert('Please enter the password.');
-
-  showSpinner('dec-spinner', true);
-  showResult('dec-result', '<span class="info">Decrypting…</span>');
-
-  const form = new FormData();
-  form.append('file', file);
-  form.append('password', pass);
-
-  const res = await fetch('/api/decrypt', { method:'POST', body: form });
-  showSpinner('dec-spinner', false);
-
-  if (!res.ok) {
-    const err = await res.json();
-    showResult('dec-result', `<span class="err">❌ ${err.error}</span>`);
-    return;
-  }
-
-  const blob = await res.blob();
-  const fname = file.name.replace(/\.enc$/, '');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'decrypted_' + fname;
-  a.click();
-  showResult('dec-result',
-    `<span class="ok">✅ File decrypted and downloaded!</span>\n\n` +
-    `Encrypted: <span class="info">${file.name}</span>\nDecrypted: <span class="ok">decrypted_${fname}</span>`
-  );
-}
-</script>
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
